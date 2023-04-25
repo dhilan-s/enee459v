@@ -129,7 +129,7 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_USB_Init();
   /* USER CODE BEGIN 2 */
-
+  what_is_it();
   /* USER CODE END 2 */
 
   /* Infinite loop */
