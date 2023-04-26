@@ -18,15 +18,10 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "usart.h"
-#include "gpio.h"
-#include "stm32l4xx_hal_conf.h"
-#include "custom_bus.h"
+#include "gyro.h"
 #include "lsm6dsl.h"
-#include "lsm6dsl_reg.h"
+#include "b_l4s5i_iot01a_bus.h"
 #include <stdio.h>
-
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -47,159 +42,24 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-extern I2C_HandleTypeDef hi2c2;
-LSM6DSL_Object_t gyro_obj;
+LSM6DSL_Object_t Gyro;
+volatile uint32_t dataRdyIntReceived;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+static void MEMS_Init(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-int32_t platform_write(uint16_t Addr, uint16_t Reg, uint8_t *pBuffer, uint16_t Length) {
-  HAL_StatusTypeDef status = HAL_OK;
-  status = HAL_I2C_Mem_Write(&hi2c2, Addr, Reg, I2C_MEMADD_SIZE_8BIT, pBuffer, Length, 1000);
-  return (int32_t)status;
-}
-
-int32_t platform_read(uint16_t Addr, uint16_t Reg, uint8_t *pBuffer, uint16_t Length) {
-  HAL_StatusTypeDef status = HAL_OK;
-  status = HAL_I2C_Mem_Read(&hi2c2, Addr, Reg, I2C_MEMADD_SIZE_8BIT, pBuffer, Length, 1000);
-  return (int32_t)status;
-}
-
-int32_t MX_I2C2_Init_Wrapper(void) {
-  //MX_I2C2_Init(&hi2c2);
-	hi2c2.Instance = I2C2;
-	  hi2c2.Init.Timing = 0x00707CBB;
-	  hi2c2.Init.OwnAddress1 = 0;
-	  hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-	  hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-	  hi2c2.Init.OwnAddress2 = 0;
-	  hi2c2.Init.OwnAddress2Masks = I2C_OA2_NOMASK;
-	  hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-	  hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-	  if (HAL_I2C_Init(&hi2c2) != HAL_OK)
-	  {
-	    Error_Handler();
-	  }
-  return 0;
-}
-
-//void init_lsm6dsl_gyroscope(void) {
-//  //LSM6DSL_Object_t gyro_obj;
-//  LSM6DSL_IO_t io_ctx;
-//
-//  // Set I2C address and interface
-//  io_ctx.BusType = LSM6DSL_I2C_BUS;
-//  io_ctx.Address = LSM6DSL_I2C_ADD_L;
-//  io_ctx.Init = MX_I2C2_Init_Wrapper;
-//  io_ctx.WriteReg = platform_write;
-//  io_ctx.ReadReg = platform_read;
-//  LSM6DSL_RegisterBusIO(&gyro_obj, &io_ctx);
-//
-//  MX_I2C2_Init(&hi2c2);
-//
-//  // Enable gyroscope
-//  LSM6DSL_Init(&gyro_obj);
-//}
-//
-void send_data_usart(const char *data) {
-  HAL_UART_Transmit(&huart1, (uint8_t *)data, strlen(data), 1000); // Replace huartX with your USART handler
-}
-
-void init_lsm6dsl_gyroscope(void) {
-	  LSM6DSL_Object_t gyro_obj;
-	  LSM6DSL_IO_t io_ctx;
-	  uint8_t who_am_i;
-	  uint8_t read_addr = 0xAF;
-	  uint8_t write_addr = 0xAE;
-
-	  // Set I2C address and interface
-	  io_ctx.BusType = LSM6DSL_I2C_BUS;
-	  io_ctx.Address = read_addr;
-	  io_ctx.Init = MX_I2C2_Init_Wrapper;
-	  io_ctx.WriteReg = platform_write;
-	  io_ctx.ReadReg = platform_read;
-	  LSM6DSL_RegisterBusIO(&gyro_obj, &io_ctx);
-
-	  MX_I2C2_Init(&hi2c2);
-
-	  // Check if the device is available
-	  if (HAL_I2C_IsDeviceReady(&hi2c2, write_addr, 3, 100) != HAL_OK) {
-	    Error_Handler(); // Implement an error handler if the device is not ready
-	  }
-
-	  // Read the WHO_AM_I register
-	  platform_write(write_addr, 0x0F, NULL, 0); // Set the register address for WHO_AM_I
-	  platform_read(read_addr, 0x0F, &who_am_i, 1); // Read a single byte from the read register
-
-	  if (who_am_i != 0x6A) { // Check if the device is detected
-	    Error_Handler(); // Implement an error handler if the device is not detected
-	  }
-
-	  // Enable gyroscope
-	  LSM6DSL_Init(&gyro_obj);
-}
-
-void read_and_send_who_am_i(void) {
-  LSM6DSL_IO_t io_ctx;
-  uint8_t who_am_i = 0;
-  char msg[64];
-
-  // Set I2C address and interface
-  io_ctx.BusType = LSM6DSL_I2C_BUS;
-  io_ctx.Address = LSM6DSL_I2C_ADD_L;
-  io_ctx.Init = MX_I2C2_Init_Wrapper;
-  io_ctx.WriteReg = platform_write;
-  io_ctx.ReadReg = platform_read;
-
-  LSM6DSL_RegisterBusIO(&gyro_obj, &io_ctx); // Move this call to this function
-
-  // Read the WHO_AM_I register
-  LSM6DSL_ReadID(&gyro_obj, &who_am_i);
-
-  // Check if the device is available
-  if (who_am_i != LSM6DSL_ID) {
-    Error_Handler(); // Implement an error handler if the device is not detected
-  }
-
-  // Convert the WHO_AM_I value to a string and send it to USART
-  snprintf(msg, sizeof(msg), "WHO_AM_I: 0x%02X\r\n", who_am_i);
-  send_data_usart(msg);
-}
-//
-//void read_and_send_who_am_i(void) {
-//  //LSM6DSL_Object_t gyro_obj;
-//  LSM6DSL_IO_t io_ctx;
-//  uint8_t who_am_i = 0;
-//  char msg[64];
-//
-//  // Set I2C address and interface
-//  io_ctx.BusType = LSM6DSL_I2C_BUS;
-//  io_ctx.Address = LSM6DSL_I2C_ADD_L;
-//  io_ctx.Init = MX_I2C2_Init_Wrapper;
-//  io_ctx.WriteReg = platform_write;
-//  io_ctx.ReadReg = platform_read;
-//  LSM6DSL_RegisterBusIO(&gyro_obj, &io_ctx);
-//
-//  // Read the WHO_AM_I register
-//  LSM6DSL_ReadID(&gyro_obj, &who_am_i);
-//
-//  if (who_am_i != LSM6DSL_ID) {
-//     Error_Handler(); // Implement an error handler if the device is not detected
-//   }
-//
-//  // Convert the WHO_AM_I value to a string and send it to USART
-//  snprintf(msg, sizeof(msg), "WHO_AM_I: 0x%02X\r\n", who_am_i);
-//  send_data_usart(msg);
-//}
 /* USER CODE END 0 */
 
 /**
@@ -231,12 +91,17 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
-  //MX_I2C2_Init(&hi2c2);
   /* USER CODE BEGIN 2 */
-  //HAL_I2C_Mem_Write
+  dataRdyIntReceived = 0;
+  MEMS_Init();
   /* USER CODE END 2 */
-  init_lsm6dsl_gyroscope();
-  read_and_send_who_am_i();
+  what_is_it();
+
+  //The argument is based on the Gyroscope ODR configuration setting for register CTRL2_G (11h)
+  write_location(1);
+
+  //Reads the Gyroscope ODR configuration
+  read_location();
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -298,8 +163,301 @@ void SystemClock_Config(void)
   }
 }
 
-/* USER CODE BEGIN 4 */
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
 
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart1.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart1, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOE_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, ST25DV04K_RF_DISABLE_Pin|ISM43362_RST_Pin|ISM43362_SPI3_CSN_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, ARD_D10_Pin|ARD_D4_Pin|ARD_D7_Pin|SPBTLE_RF_RST_Pin
+                          |ARD_D9_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, ARD_D8_Pin|ISM43362_BOOT0_Pin|ISM43362_WAKEUP_Pin|LED2_Pin
+                          |SPSGRF_915_SDN_Pin|ARD_D5_Pin|SPSGRF_915_SPI3_CSN_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, SPBTLE_RF_SPI3_CSN_Pin|PMOD_RESET_Pin|PMOD_SPI2_SCK_Pin|STSAFE_A110_RESET_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, VL53L0X_XSHUT_Pin|LED3_WIFI__LED4_BLE_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : ST25DV04K_RF_DISABLE_Pin ISM43362_RST_Pin ISM43362_SPI3_CSN_Pin */
+  GPIO_InitStruct.Pin = ST25DV04K_RF_DISABLE_Pin|ISM43362_RST_Pin|ISM43362_SPI3_CSN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : USB_OTG_FS_OVRCR_EXTI3_Pin ST25DV04K_GPO_Pin SPSGRF_915_GPIO3_EXTI5_Pin SPBTLE_RF_IRQ_EXTI6_Pin
+                           ISM43362_DRDY_EXTI1_Pin */
+  GPIO_InitStruct.Pin = USB_OTG_FS_OVRCR_EXTI3_Pin|ST25DV04K_GPO_Pin|SPSGRF_915_GPIO3_EXTI5_Pin|SPBTLE_RF_IRQ_EXTI6_Pin
+                          |ISM43362_DRDY_EXTI1_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : BUTTON_EXTI13_Pin VL53L0X_GPIO1_EXTI7_Pin LSM3MDL_DRDY_EXTI8_Pin */
+  GPIO_InitStruct.Pin = BUTTON_EXTI13_Pin|VL53L0X_GPIO1_EXTI7_Pin|LSM3MDL_DRDY_EXTI8_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : ARD_A5_Pin ARD_A4_Pin ARD_A3_Pin ARD_A2_Pin
+                           ARD_A1_Pin ARD_A0_Pin */
+  GPIO_InitStruct.Pin = ARD_A5_Pin|ARD_A4_Pin|ARD_A3_Pin|ARD_A2_Pin
+                          |ARD_A1_Pin|ARD_A0_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_ANALOG_ADC_CONTROL;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : ARD_D1_Pin ARD_D0_Pin */
+  GPIO_InitStruct.Pin = ARD_D1_Pin|ARD_D0_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF8_UART4;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : ARD_D10_Pin ARD_D4_Pin ARD_D7_Pin SPBTLE_RF_RST_Pin
+                           ARD_D9_Pin */
+  GPIO_InitStruct.Pin = ARD_D10_Pin|ARD_D4_Pin|ARD_D7_Pin|SPBTLE_RF_RST_Pin
+                          |ARD_D9_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : ARD_D13_Pin ARD_D12_Pin ARD_D11_Pin */
+  GPIO_InitStruct.Pin = ARD_D13_Pin|ARD_D12_Pin|ARD_D11_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : ARD_D3_Pin */
+  GPIO_InitStruct.Pin = ARD_D3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(ARD_D3_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : ARD_D6_Pin */
+  GPIO_InitStruct.Pin = ARD_D6_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
+  HAL_GPIO_Init(ARD_D6_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : ARD_D8_Pin ISM43362_BOOT0_Pin ISM43362_WAKEUP_Pin LED2_Pin
+                           SPSGRF_915_SDN_Pin ARD_D5_Pin SPSGRF_915_SPI3_CSN_Pin */
+  GPIO_InitStruct.Pin = ARD_D8_Pin|ISM43362_BOOT0_Pin|ISM43362_WAKEUP_Pin|LED2_Pin
+                          |SPSGRF_915_SDN_Pin|ARD_D5_Pin|SPSGRF_915_SPI3_CSN_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : DFSDM1_DATIN2_Pin DFSDM1_CKOUT_Pin */
+  GPIO_InitStruct.Pin = DFSDM1_DATIN2_Pin|DFSDM1_CKOUT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Alternate = GPIO_AF6_DFSDM1;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : QUADSPI_CLK_Pin QUADSPI_NCS_Pin OQUADSPI_BK1_IO0_Pin QUADSPI_BK1_IO1_Pin
+                           QUAD_SPI_BK1_IO2_Pin QUAD_SPI_BK1_IO3_Pin */
+  GPIO_InitStruct.Pin = QUADSPI_CLK_Pin|QUADSPI_NCS_Pin|OQUADSPI_BK1_IO0_Pin|QUADSPI_BK1_IO1_Pin
+                          |QUAD_SPI_BK1_IO2_Pin|QUAD_SPI_BK1_IO3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF10_OCTOSPIM_P1;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : INTERNAL_UART3_TX_Pin INTERNAL_UART3_RX_Pin */
+  GPIO_InitStruct.Pin = INTERNAL_UART3_TX_Pin|INTERNAL_UART3_RX_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF7_USART3;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : LPS22HB_INT_DRDY_EXTI10_Pin LSM6DSL_INT1_EXTI11_Pin USB_OTG_FS_PWR_EN_Pin ARD_D2_Pin
+                           HTS221_DRDY_EXTI15_Pin PMOD_IRQ_EXTI2_Pin */
+  GPIO_InitStruct.Pin = LPS22HB_INT_DRDY_EXTI10_Pin|LSM6DSL_INT1_EXTI11_Pin|USB_OTG_FS_PWR_EN_Pin|ARD_D2_Pin
+                          |HTS221_DRDY_EXTI15_Pin|PMOD_IRQ_EXTI2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : SPBTLE_RF_SPI3_CSN_Pin PMOD_RESET_Pin PMOD_SPI2_SCK_Pin STSAFE_A110_RESET_Pin */
+  GPIO_InitStruct.Pin = SPBTLE_RF_SPI3_CSN_Pin|PMOD_RESET_Pin|PMOD_SPI2_SCK_Pin|STSAFE_A110_RESET_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : VL53L0X_XSHUT_Pin LED3_WIFI__LED4_BLE_Pin */
+  GPIO_InitStruct.Pin = VL53L0X_XSHUT_Pin|LED3_WIFI__LED4_BLE_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : USB_OTG_FS_VBUS_Pin */
+  GPIO_InitStruct.Pin = USB_OTG_FS_VBUS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(USB_OTG_FS_VBUS_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : INTERNAL_SPI3_SCK_Pin INTERNAL_SPI3_MISO_Pin INTERNAL_SPI3_MOSI_Pin */
+  GPIO_InitStruct.Pin = INTERNAL_SPI3_SCK_Pin|INTERNAL_SPI3_MISO_Pin|INTERNAL_SPI3_MOSI_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF6_SPI3;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : PMOD_UART2_CTS_Pin PMOD_UART2_RTS_Pin PMOD_UART2_TX_Pin PMOD_UART2_RX_Pin */
+  GPIO_InitStruct.Pin = PMOD_UART2_CTS_Pin|PMOD_UART2_RTS_Pin|PMOD_UART2_TX_Pin|PMOD_UART2_RX_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : ARD_D15_Pin ARD_D14_Pin */
+  GPIO_InitStruct.Pin = ARD_D15_Pin|ARD_D14_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
+}
+
+/* USER CODE BEGIN 4 */
+int _write(int fd, char * ptr, int len)
+{
+  HAL_UART_Transmit(&huart1, (uint8_t *) ptr, len, HAL_MAX_DELAY);
+  return len;
+}
+
+static void MEMS_Init(void)
+{
+  LSM6DSL_IO_t io_ctx;
+  uint8_t id;
+  LSM6DSL_AxesRaw_t axes;
+
+  /* Link I2C functions to the LSM6DSL driver */
+  io_ctx.BusType     = LSM6DSL_I2C_BUS;
+  io_ctx.Address     = LSM6DSL_I2C_ADD_L;
+  io_ctx.Init        = BSP_I2C2_Init;
+  io_ctx.DeInit      = BSP_I2C2_DeInit;
+  io_ctx.ReadReg     = BSP_I2C2_ReadReg;
+  io_ctx.WriteReg    = BSP_I2C2_WriteReg;
+  io_ctx.GetTick     = BSP_GetTick;
+  LSM6DSL_RegisterBusIO(&Gyro, &io_ctx);
+
+  /* Read the LSM6DSL WHO_AM_I register */
+  LSM6DSL_ReadID(&Gyro, &id);
+  if (id != LSM6DSL_ID) {
+    Error_Handler();
+  }
+
+  //printf("WHO_AM_I: %5x \r\n", (int)id);
+  /* Initialize the LSM6DSL sensor */
+  LSM6DSL_Init(&Gyro);
+
+  //LSM6DSL_G(&Gyro, LSM6DSL_2000dps);
+  /* Configure the LSM6DSL gyroscope (ODR, scale and interrupt) */
+  LSM6DSL_GYRO_SetOutputDataRate(&Gyro, LSM6DSL_GY_ODR_26Hz); /* 26 Hz */
+  LSM6DSL_GYRO_SetFullScale(&Gyro, 4);          /* [-4000mg; +4000mg] */
+  LSM6DSL_GYRO_Set_INT1_DRDY(&Gyro, ENABLE);    /* Enable DRDY */
+  LSM6DSL_GYRO_GetAxesRaw(&Gyro, &axes);        /* Clear DRDY */
+
+  /* Start the LSM6DSL accelerometer */
+  LSM6DSL_GYRO_Enable(&Gyro);
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if (GPIO_Pin == GPIO_PIN_11) {
+    dataRdyIntReceived++;
+  }
+}
 /* USER CODE END 4 */
 
 /**
