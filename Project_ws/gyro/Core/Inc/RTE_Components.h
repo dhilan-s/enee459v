@@ -25,5 +25,7 @@
 /* STMicroelectronics.X-CUBE-BLE1.6.2.4 */
 #define HCI_TL
 #define HCI_TL_INTERFACE
+/* STMicroelectronics.X-CUBE-MEMS1.9.6.0 */
+#define LSM6DSL_ACCGYR_I2C
 
 #endif /* __RTE_COMPONENTS_H__ */

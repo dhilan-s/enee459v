@@ -25,6 +25,7 @@ BlueNRG-MS/Target \
 Core/Src \
 Core/Startup \
 Drivers/BSP/B-L4S5I-IOT01A \
+Drivers/BSP/Components/lsm6dsl \
 Drivers/STM32L4xx_HAL_Driver/Src \
 Middlewares/ST/BlueNRG-MS/hci/controller \
 Middlewares/ST/BlueNRG-MS/hci \

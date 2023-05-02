@@ -39,7 +39,12 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../BlueNRG-MS/Target/hci_tl_interface.h \
  ../Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_bus.h \
  ../Core/Inc/b_l4s5i_iot01a_conf.h \
- ../Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_errno.h
+ ../Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_errno.h ../Core/Inc/adc.h \
+ ../Core/Inc/main.h ../Core/Inc/dfsdm.h ../Core/Inc/i2c.h \
+ ../Core/Inc/octospi.h ../Core/Inc/spi.h ../Core/Inc/usart.h \
+ ../Core/Inc/usb_otg.h ../Core/Inc/gpio.h \
+ ../Drivers/BSP/Components/lsm6dsl/lsm6dsl.h \
+ ../Drivers/BSP/Components/lsm6dsl/lsm6dsl_reg.h
 ../Core/Inc/main.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
@@ -82,3 +87,14 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_bus.h:
 ../Core/Inc/b_l4s5i_iot01a_conf.h:
 ../Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_errno.h:
+../Core/Inc/adc.h:
+../Core/Inc/main.h:
+../Core/Inc/dfsdm.h:
+../Core/Inc/i2c.h:
+../Core/Inc/octospi.h:
+../Core/Inc/spi.h:
+../Core/Inc/usart.h:
+../Core/Inc/usb_otg.h:
+../Core/Inc/gpio.h:
+../Drivers/BSP/Components/lsm6dsl/lsm6dsl.h:
+../Drivers/BSP/Components/lsm6dsl/lsm6dsl_reg.h:

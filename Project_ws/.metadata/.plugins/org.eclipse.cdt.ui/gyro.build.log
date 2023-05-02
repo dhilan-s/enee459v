@@ -1,106 +1,17 @@
-16:28:41 **** Incremental Build of configuration Debug for project gyro ****
+17:39:45 **** Incremental Build of configuration Debug for project gyro ****
 make -j8 all 
-arm-none-eabi-gcc "../Core/Src/gyro.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4S5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -I../BlueNRG-MS/Target -I../Drivers/BSP/B-L4S5I-IOT01A -I../Middlewares/ST/BlueNRG-MS/utils -I../Middlewares/ST/BlueNRG-MS/includes -I../Middlewares/ST/BlueNRG-MS/hci/hci_tl_patterns/Basic -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/gyro.d" -MT"Core/Src/gyro.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/gyro.o"
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4S5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -I../BlueNRG-MS/Target -I../Drivers/BSP/B-L4S5I-IOT01A -I../Middlewares/ST/BlueNRG-MS/utils -I../Middlewares/ST/BlueNRG-MS/includes -I../Middlewares/ST/BlueNRG-MS/hci/hci_tl_patterns/Basic -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/gyro.c:6:10: fatal error: lsm6dsl.h: No such file or directory
-    6 | #include "lsm6dsl.h"
-      |          ^~~~~~~~~~~
-compilation terminated.
-make: *** [Core/Src/subdir.mk:55: Core/Src/gyro.o] Error 1
-make: *** Waiting for unfinished jobs....
-../Core/Src/main.c:59:1: error: unknown type name 'LSM6DSL_Object_t'
-   59 | LSM6DSL_Object_t Gyro;
-      | ^~~~~~~~~~~~~~~~
-../Core/Src/main.c: In function 'main':
-../Core/Src/main.c:132:3: warning: implicit declaration of function 'MX_BlueNRG_MS_Init' [-Wimplicit-function-declaration]
-  132 |   MX_BlueNRG_MS_Init();
-      |   ^~~~~~~~~~~~~~~~~~
-../Core/Src/main.c:142:4: warning: implicit declaration of function 'MX_BlueNRG_MS_Process' [-Wimplicit-function-declaration]
-  142 |    MX_BlueNRG_MS_Process();
-      |    ^~~~~~~~~~~~~~~~~~~~~
-../Core/Src/main.c: In function 'MEMS_Init':
-../Core/Src/main.c:868:3: error: unknown type name 'LSM6DSL_IO_t'
-  868 |   LSM6DSL_IO_t io_ctx;
-      |   ^~~~~~~~~~~~
-../Core/Src/main.c:870:3: error: unknown type name 'LSM6DSL_AxesRaw_t'
-  870 |   LSM6DSL_AxesRaw_t axes;
-      |   ^~~~~~~~~~~~~~~~~
-../Core/Src/main.c:873:9: error: request for member 'BusType' in something not a structure or union
-  873 |   io_ctx.BusType     = LSM6DSL_I2C_BUS;
-      |         ^
-../Core/Src/main.c:873:24: error: 'LSM6DSL_I2C_BUS' undeclared (first use in this function)
-  873 |   io_ctx.BusType     = LSM6DSL_I2C_BUS;
-      |                        ^~~~~~~~~~~~~~~
-../Core/Src/main.c:873:24: note: each undeclared identifier is reported only once for each function it appears in
-../Core/Src/main.c:874:9: error: request for member 'Address' in something not a structure or union
-  874 |   io_ctx.Address     = LSM6DSL_I2C_ADD_L;
-      |         ^
-../Core/Src/main.c:874:24: error: 'LSM6DSL_I2C_ADD_L' undeclared (first use in this function)
-  874 |   io_ctx.Address     = LSM6DSL_I2C_ADD_L;
-      |                        ^~~~~~~~~~~~~~~~~
-../Core/Src/main.c:875:9: error: request for member 'Init' in something not a structure or union
-  875 |   io_ctx.Init        = BSP_I2C2_Init;
-      |         ^
-../Core/Src/main.c:875:24: error: 'BSP_I2C2_Init' undeclared (first use in this function); did you mean 'MX_I2C2_Init'?
-  875 |   io_ctx.Init        = BSP_I2C2_Init;
-      |                        ^~~~~~~~~~~~~
-      |                        MX_I2C2_Init
-../Core/Src/main.c:876:9: error: request for member 'DeInit' in something not a structure or union
-  876 |   io_ctx.DeInit      = BSP_I2C2_DeInit;
-      |         ^
-../Core/Src/main.c:876:24: error: 'BSP_I2C2_DeInit' undeclared (first use in this function); did you mean 'BSP_SPI3_DeInit'?
-  876 |   io_ctx.DeInit      = BSP_I2C2_DeInit;
-      |                        ^~~~~~~~~~~~~~~
-      |                        BSP_SPI3_DeInit
-../Core/Src/main.c:877:9: error: request for member 'ReadReg' in something not a structure or union
-  877 |   io_ctx.ReadReg     = BSP_I2C2_ReadReg;
-      |         ^
-../Core/Src/main.c:877:24: error: 'BSP_I2C2_ReadReg' undeclared (first use in this function); did you mean 'LL_ADC_ReadReg'?
-  877 |   io_ctx.ReadReg     = BSP_I2C2_ReadReg;
-      |                        ^~~~~~~~~~~~~~~~
-      |                        LL_ADC_ReadReg
-../Core/Src/main.c:878:9: error: request for member 'WriteReg' in something not a structure or union
-  878 |   io_ctx.WriteReg    = BSP_I2C2_WriteReg;
-      |         ^
-../Core/Src/main.c:878:24: error: 'BSP_I2C2_WriteReg' undeclared (first use in this function); did you mean 'LL_ADC_WriteReg'?
-  878 |   io_ctx.WriteReg    = BSP_I2C2_WriteReg;
-      |                        ^~~~~~~~~~~~~~~~~
-      |                        LL_ADC_WriteReg
-../Core/Src/main.c:879:9: error: request for member 'GetTick' in something not a structure or union
-  879 |   io_ctx.GetTick     = BSP_GetTick;
-      |         ^
-../Core/Src/main.c:880:3: warning: implicit declaration of function 'LSM6DSL_RegisterBusIO' [-Wimplicit-function-declaration]
-  880 |   LSM6DSL_RegisterBusIO(&Gyro, &io_ctx);
-      |   ^~~~~~~~~~~~~~~~~~~~~
-../Core/Src/main.c:883:3: warning: implicit declaration of function 'LSM6DSL_ReadID' [-Wimplicit-function-declaration]
-  883 |   LSM6DSL_ReadID(&Gyro, &id);
-      |   ^~~~~~~~~~~~~~
-../Core/Src/main.c:884:13: error: 'LSM6DSL_ID' undeclared (first use in this function)
-  884 |   if (id != LSM6DSL_ID) {
-      |             ^~~~~~~~~~
-../Core/Src/main.c:890:3: warning: implicit declaration of function 'LSM6DSL_Init' [-Wimplicit-function-declaration]
-  890 |   LSM6DSL_Init(&Gyro);
-      |   ^~~~~~~~~~~~
-../Core/Src/main.c:894:3: warning: implicit declaration of function 'LSM6DSL_GYRO_SetOutputDataRate' [-Wimplicit-function-declaration]
-  894 |   LSM6DSL_GYRO_SetOutputDataRate(&Gyro, LSM6DSL_GY_ODR_26Hz); /* 26 Hz */
-      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-../Core/Src/main.c:894:41: error: 'LSM6DSL_GY_ODR_26Hz' undeclared (first use in this function)
-  894 |   LSM6DSL_GYRO_SetOutputDataRate(&Gyro, LSM6DSL_GY_ODR_26Hz); /* 26 Hz */
-      |                                         ^~~~~~~~~~~~~~~~~~~
-../Core/Src/main.c:895:3: warning: implicit declaration of function 'LSM6DSL_GYRO_SetFullScale' [-Wimplicit-function-declaration]
-  895 |   LSM6DSL_GYRO_SetFullScale(&Gyro, 4);          /* [-4000mg; +4000mg] */
-      |   ^~~~~~~~~~~~~~~~~~~~~~~~~
-../Core/Src/main.c:896:3: warning: implicit declaration of function 'LSM6DSL_GYRO_Set_INT1_DRDY' [-Wimplicit-function-declaration]
-  896 |   LSM6DSL_GYRO_Set_INT1_DRDY(&Gyro, ENABLE);    /* Enable DRDY */
-      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~
-../Core/Src/main.c:897:3: warning: implicit declaration of function 'LSM6DSL_GYRO_GetAxesRaw' [-Wimplicit-function-declaration]
-  897 |   LSM6DSL_GYRO_GetAxesRaw(&Gyro, &axes);        /* Clear DRDY */
-      |   ^~~~~~~~~~~~~~~~~~~~~~~
-../Core/Src/main.c:900:3: warning: implicit declaration of function 'LSM6DSL_GYRO_Enable' [-Wimplicit-function-declaration]
-  900 |   LSM6DSL_GYRO_Enable(&Gyro);
-      |   ^~~~~~~~~~~~~~~~~~~
-make: *** [Core/Src/subdir.mk:55: Core/Src/main.o] Error 1
-"make -j8 all" terminated with exit code 2. Build might be incomplete.
+arm-none-eabi-gcc "../Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_bus.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32L4S5xx -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -I../BlueNRG-MS/Target -I../Drivers/BSP/B-L4S5I-IOT01A -I../Middlewares/ST/BlueNRG-MS/utils -I../Middlewares/ST/BlueNRG-MS/includes -I../Middlewares/ST/BlueNRG-MS/hci/hci_tl_patterns/Basic -I../X-CUBE-MEMS1/Target -I../Drivers/BSP/Components/lsm6dsl -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_bus.d" -MT"Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_bus.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_bus.o"
+arm-none-eabi-gcc -o "gyro.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\PC\OneDrive - University of Maryland\S8\ENEE459V\My Work\HW11a\enee459v\Project_ws\gyro\STM32L4S5VITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="gyro.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: gyro.elf
+ 
+arm-none-eabi-size   gyro.elf 
+arm-none-eabi-objdump -h -S  gyro.elf  > "gyro.list"
+   text	   data	    bss	    dec	    hex	filename
+  49636	    124	   3932	  53692	   d1bc	gyro.elf
+Finished building: default.size.stdout
+ 
+Finished building: gyro.list
+ 
 
-16:28:44 Build Failed. 22 errors, 10 warnings. (took 2s.292ms)
+17:39:48 Build Finished. 0 errors, 0 warnings. (took 3s.144ms)
 

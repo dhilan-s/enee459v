@@ -1,6 +1,5 @@
-Core/Src/stm32l4xx_hal_timebase_tim.o: \
- ../Core/Src/stm32l4xx_hal_timebase_tim.c \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h \
+Core/Src/dfsdm.o: ../Core/Src/dfsdm.c ../Core/Inc/dfsdm.h \
+ ../Core/Inc/main.h ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h \
  ../Core/Inc/stm32l4xx_hal_conf.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_def.h \
@@ -37,8 +36,12 @@ Core/Src/stm32l4xx_hal_timebase_tim.o: \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h
+ ../BlueNRG-MS/Target/hci_tl_interface.h \
+ ../Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_bus.h \
+ ../Core/Inc/b_l4s5i_iot01a_conf.h \
+ ../Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_errno.h
+../Core/Inc/dfsdm.h:
+../Core/Inc/main.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h:
@@ -76,5 +79,7 @@ Core/Src/stm32l4xx_hal_timebase_tim.o: \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h:
-../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim_ex.h:
+../BlueNRG-MS/Target/hci_tl_interface.h:
+../Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_bus.h:
+../Core/Inc/b_l4s5i_iot01a_conf.h:
+../Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_errno.h:
