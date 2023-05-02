@@ -19,3 +19,6 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data C:\Users\PC\OneD
 
 !ENTRY org.eclipse.equinox.p2.metadata.repository 4 1000 2023-05-02 15:45:01.324
 !MESSAGE No repository found at https://github.com/STMicroelectronics/x-cube-ble1.git.
+
+!ENTRY org.eclipse.cdt.core 1 0 2023-05-02 15:45:20.777
+!MESSAGE Indexed 'gyro' (39 sources, 161 headers) in 19.5 sec: 17,054 declarations; 78,519 references; 9 unresolved inclusions; 46 syntax errors; 196 unresolved names (0.2%)
