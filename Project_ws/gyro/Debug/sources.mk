@@ -21,7 +21,13 @@ C_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
+BlueNRG-MS/Target \
 Core/Src \
 Core/Startup \
+Drivers/BSP/B-L4S5I-IOT01A \
 Drivers/STM32L4xx_HAL_Driver/Src \
+Middlewares/ST/BlueNRG-MS/hci/controller \
+Middlewares/ST/BlueNRG-MS/hci \
+Middlewares/ST/BlueNRG-MS/hci/hci_tl_patterns/Basic \
+Middlewares/ST/BlueNRG-MS/utils \
 

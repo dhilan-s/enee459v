@@ -1,3 +1,0 @@
-../Core/Src/gyro.c:21:6:what_is_it	24	static
-../Core/Src/gyro.c:27:6:write_location	24	static
-../Core/Src/gyro.c:32:6:read_location	24	static

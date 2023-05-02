@@ -1,4 +1,16 @@
-Core/Src/gyro.o: ../Core/Src/gyro.c ../Core/Inc/main.h \
+Middlewares/ST/BlueNRG-MS/hci/hci_le.o: \
+ ../Middlewares/ST/BlueNRG-MS/hci/hci_le.c \
+ ../Middlewares/ST/BlueNRG-MS/includes/hci_le.h \
+ ../Middlewares/ST/BlueNRG-MS/includes/bluenrg_types.h \
+ ../Middlewares/ST/BlueNRG-MS/includes/link_layer.h \
+ ../Middlewares/ST/BlueNRG-MS/includes/bluenrg_def.h \
+ ../Middlewares/ST/BlueNRG-MS/includes/bluenrg_types.h \
+ ../Middlewares/ST/BlueNRG-MS/includes/bluenrg_def.h \
+ ../Middlewares/ST/BlueNRG-MS/includes/hci_const.h \
+ ../Middlewares/ST/BlueNRG-MS/hci/hci_tl_patterns/Basic/hci_tl.h \
+ ../BlueNRG-MS/Target/hci_tl_interface.h \
+ ../Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_bus.h \
+ ../Core/Inc/b_l4s5i_iot01a_conf.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h \
  ../Core/Inc/stm32l4xx_hal_conf.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h \
@@ -35,8 +47,20 @@ Core/Src/gyro.o: ../Core/Src/gyro.c ../Core/Inc/main.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h \
  ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h \
- ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h
-../Core/Inc/main.h:
+ ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h \
+ ../Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_errno.h \
+ ../Middlewares/ST/BlueNRG-MS/utils/ble_list.h ../Core/Inc/bluenrg_conf.h
+../Middlewares/ST/BlueNRG-MS/includes/hci_le.h:
+../Middlewares/ST/BlueNRG-MS/includes/bluenrg_types.h:
+../Middlewares/ST/BlueNRG-MS/includes/link_layer.h:
+../Middlewares/ST/BlueNRG-MS/includes/bluenrg_def.h:
+../Middlewares/ST/BlueNRG-MS/includes/bluenrg_types.h:
+../Middlewares/ST/BlueNRG-MS/includes/bluenrg_def.h:
+../Middlewares/ST/BlueNRG-MS/includes/hci_const.h:
+../Middlewares/ST/BlueNRG-MS/hci/hci_tl_patterns/Basic/hci_tl.h:
+../BlueNRG-MS/Target/hci_tl_interface.h:
+../Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_bus.h:
+../Core/Inc/b_l4s5i_iot01a_conf.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:
 ../Core/Inc/stm32l4xx_hal_conf.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rcc.h:
@@ -74,3 +98,6 @@ Core/Src/gyro.o: ../Core/Src/gyro.c ../Core/Inc/main.h \
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:
 ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart_ex.h:
+../Drivers/BSP/B-L4S5I-IOT01A/b_l4s5i_iot01a_errno.h:
+../Middlewares/ST/BlueNRG-MS/utils/ble_list.h:
+../Core/Inc/bluenrg_conf.h:

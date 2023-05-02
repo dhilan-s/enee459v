@@ -1,0 +1,13 @@
+../Core/Src/sample_service.c:87:12:Add_Sample_Service	128	static
+../Core/Src/sample_service.c:149:6:Make_Connection	56	static
+../Core/Src/sample_service.c:196:6:startReadTXCharHandle	40	static
+../Core/Src/sample_service.c:213:6:startReadRXCharHandle	40	static
+../Core/Src/sample_service.c:232:6:receiveData	24	static
+../Core/Src/sample_service.c:252:6:sendData	24	static
+../Core/Src/sample_service.c:262:6:sendButton	24	static
+../Core/Src/sample_service.c:271:6:enableNotification	16	static
+../Core/Src/sample_service.c:291:6:Attribute_Modified_CB	24	static
+../Core/Src/sample_service.c:308:6:GAP_ConnectionComplete_CB	24	static
+../Core/Src/sample_service.c:325:6:GAP_DisconnectionComplete_CB	8	static
+../Core/Src/sample_service.c:346:6:GATT_Notification_CB	16	static
+../Core/Src/sample_service.c:360:6:user_notify	56	static

@@ -55,7 +55,7 @@ uint16_t sampleServHandle, buttonServHandle, TXCharHandle, RXCharHandle, buttonC
 
 extern uint8_t bnrg_expansion_board;
 extern BLE_RoleTypeDef BLE_Role;
-extern int ledState;
+extern uint8_t command[];
 extern int buttonState;
 /**
  * @}
@@ -101,23 +101,37 @@ tBleStatus Add_Sample_Service(void)
   const uint8_t buttonservice_uuid[16] = {0x66,0x9a,0x0c,0x20,0x00,0x08,0x96,0x9e,0xe2,0x11,0x9e,0xb1,0xe3,0xf2,0x73,0xd9};
   const uint8_t buttonchar_uuid[16] = {0x66,0x9a,0x0c,0x20,0x00,0x08,0x96,0x9e,0xe2,0x11,0x9e,0xb1,0xe4,0xf2,0x73,0xd9};
 
+  // Main service
   ret = aci_gatt_add_serv(UUID_TYPE_128, service_uuid, PRIMARY_SERVICE, 7, &sampleServHandle); /* original is 9?? */
   if (ret != BLE_STATUS_SUCCESS) goto fail;
 
-  ret = aci_gatt_add_serv(UUID_TYPE_128, buttonservice_uuid, PRIMARY_SERVICE, 7, &buttonServHandle); /* original is 9?? */
+  /*
+   * Second service - probably not needed *
+   *
+   ret = aci_gatt_add_serv(UUID_TYPE_128, buttonservice_uuid, PRIMARY_SERVICE, 7, &buttonServHandle); /* original is 9??
     if (ret != BLE_STATUS_SUCCESS) goto fail;
+   *
+   */
 
+  // Notify characteristic, used for output (max of 8 bytes)
   ret =  aci_gatt_add_char(sampleServHandle, UUID_TYPE_128, charUuidTX, 20, CHAR_PROP_NOTIFY, ATTR_PERMISSION_NONE, 0,
-                           16, 1, &TXCharHandle);
+                           16, 8, &TXCharHandle);
   if (ret != BLE_STATUS_SUCCESS) goto fail;
 
+  // Command characteristic, write to this to send commands (max of 7 bytes)
   ret =  aci_gatt_add_char(sampleServHandle, UUID_TYPE_128, charUuidRX, 20, CHAR_PROP_WRITE|CHAR_PROP_WRITE_WITHOUT_RESP, ATTR_PERMISSION_NONE, GATT_NOTIFY_ATTRIBUTE_WRITE,
-                           16, 1, &RXCharHandle);
+                           16, 7, &RXCharHandle);
   if (ret != BLE_STATUS_SUCCESS) goto fail;
 
-  ret =  aci_gatt_add_char(buttonServHandle, UUID_TYPE_128, buttonchar_uuid, 20, CHAR_PROP_NOTIFY, ATTR_PERMISSION_NONE, 0,
+  /*
+   * Second service characteristic - probably not needed *
+   *
+   * ret =  aci_gatt_add_char(buttonServHandle, UUID_TYPE_128, buttonchar_uuid, 20, CHAR_PROP_NOTIFY, ATTR_PERMISSION_NONE, 0,
                            16, 1, &buttonCharHandle);
   if (ret != BLE_STATUS_SUCCESS) goto fail;
+  *
+  *
+  */
 
   PRINTF("Sample Service added.\nTX Char Handle %04X, RX Char Handle %04X\n", TXCharHandle, RXCharHandle);
   return BLE_STATUS_SUCCESS;
@@ -221,9 +235,8 @@ void receiveData(uint8_t* data_buffer, uint8_t Nb_bytes)
 
   for(int i = 0; i < Nb_bytes; i++) {
     printf("%c", data_buffer[i]);
+    command[i] = data_buffer[i];
   }
-
-  ledState = data_buffer[0];
 
   fflush(stdout);
 
