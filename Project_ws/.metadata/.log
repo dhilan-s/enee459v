@@ -13,3 +13,9 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data C:\Users\PC\OneD
 
 !ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2023-05-02 15:40:41.432
 !MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.equinox.p2.metadata.repository 4 1000 2023-05-02 15:44:54.841
+!MESSAGE No repository found at jar:file:/C:/Users/PC/Downloads/x-cube-ble1-main.zip!/.
+
+!ENTRY org.eclipse.equinox.p2.metadata.repository 4 1000 2023-05-02 15:45:01.324
+!MESSAGE No repository found at https://github.com/STMicroelectronics/x-cube-ble1.git.

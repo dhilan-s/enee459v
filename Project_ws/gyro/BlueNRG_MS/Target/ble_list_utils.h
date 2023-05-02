@@ -1,9 +1,8 @@
-/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file
-  * @author  MCD Application Team
-  * @version V2.0.0
+  * @file    Target/ble_list_utils.h
+  * @author  SRA Application Team
+  * @brief   Header file
   ******************************************************************************
   * @attention
   *
@@ -16,17 +15,20 @@
   *
   ******************************************************************************
   */
-/* USER CODE END Header */
-  /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef  __RTE_COMPONENTS_H__
-#define  __RTE_COMPONENTS_H__
 
-/* Defines ------------------------------------------------------------------*/
-/* STMicroelectronics.X-CUBE-MEMS1.9.5.0 */
-#define LSM6DSL_ACCGYR_I2C
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef BLE_LIST_UTILS_H
+#define BLE_LIST_UTILS_H
 
-/* STMicroelectronics.X-CUBE-BLE1.6.2.4 */
-#define HCI_TL
-#define HCI_TL_INTERFACE
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#endif /* __RTE_COMPONENTS_H__ */
+/* Includes ------------------------------------------------------------------*/
+#include "stm32l4xx_hal.h"
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* BLE_LIST_UTILS_H */
+
