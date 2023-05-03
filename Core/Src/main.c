@@ -22,95 +22,141 @@
 #include "lsm6dsl.h"
 #include "b_l4s5i_iot01a_bus.h"
 #include <stdio.h>
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
+#include <ctype.h>
 
-/* USER CODE END Includes */
-
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart1;
 
-/* USER CODE BEGIN PV */
+//Command Buffer- with sample command that sets the ODR of Gyro to 3.33 kHz.
+uint8_t command[] = ":0402000D02EB";
+
+
+//return buffer - results from the functions will be stored here
+uint8_t result[13];
+
+
 LSM6DSL_Object_t Gyro;
 volatile uint32_t dataRdyIntReceived;
-/* USER CODE END PV */
 
-/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART1_UART_Init(void);
-/* USER CODE BEGIN PFP */
 static void MEMS_Init(void);
-/* USER CODE END PFP */
+static void gyro_cmdHandler(uint8_t command[]);
+static int checkSum(uint8_t command[]);
+static int hex2dec(uint8_t command[], uint8_t start,uint8_t end);
 
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
+//Command handler for the gyroscope
+void gyro_cmdHandler(uint8_t command[]){
 
-/* USER CODE END 0 */
+	//Checks to see if the command is valid
+	int check = checkSum(command);
 
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
+	//check == 0 if command is valid
+	if (check == 0){
+
+		//converts the functionID from hex to decimal
+		uint8_t flag = hex2dec(command, 4, 3);
+		uint16_t argument;
+
+		switch (flag){
+
+		//Initializes the gyroscope
+		case 0: MEMS_Init();
+				break;
+
+		//Returns WHO_AM_I
+		case 1: what_is_it();
+				break;
+
+		//With an argument sets the ODR of the gyroscope. Check gyro.c for specifics.
+		case 2:	argument = hex2dec(command, 10, 7);
+				write_location(argument);
+				break;
+
+		//With an argument sets the ODR of the gyroscope. Check gyro.c for specifics.
+		case 3:	read_location();
+				break;
+
+		//Reads the current position of the gyroscope
+		case 4: read_cur_position();
+				break;
+
+		default:;
+		}
+	}
+
+}
+
+//Check sum check
+int checkSum(uint8_t hex[]){
+	int16_t decimal = 0, i, sum = 0;
+	for (i = 1; i <= 10; i++) {
+		if (isdigit(hex[i])) {
+		   decimal += (hex[i] - '0');
+	   }
+	   else if (isalpha(hex[i])) {
+		   decimal += (toupper(hex[i]) - 'A' + 10);
+	   }
+	}
+
+	//Converts the checksum to decimal and applies 2's compliment
+	sum = hex2dec(hex, 12, 11);
+	sum = sum - 256;
+
+	//Adds the arguments to the checksum. If zero it means checksum is valid.
+	decimal = decimal + sum;
+	return decimal;
+}
+
+//Takes in the command array and converts the arguments from hex to decimal
+//start-the index of the right most digit of the hex value
+//end- the index of the left most digit of the hex value
+int hex2dec(uint8_t hex[], uint8_t start, uint8_t end) {
+    int decimal = 0, base = 1, i;
+
+    for (i = start; i >= end; i--) {
+           if (isdigit(hex[i])) {
+               decimal += (hex[i] - '0') * base;
+               base *= 16;
+           }
+           else if (isalpha(hex[i])) {
+               decimal += (toupper(hex[i]) - 'A' + 10) * base;
+               base *= 16;
+           }
+    }
+
+    return decimal;
+}
+
+
+
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
   SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
-  /* USER CODE BEGIN 2 */
+
   dataRdyIntReceived = 0;
-  MEMS_Init();
-  /* USER CODE END 2 */
-  what_is_it();
 
-  //The argument is based on the Gyroscope ODR configuration setting for register CTRL2_G (11h)
-  write_location(1);
+  //Un-comment MEMS_Init() for testing other wise if method 0 is not called
+  //Hardfault error will occur.
+  //MEMS_Init();
 
-  //Reads the Gyroscope ODR configuration
-  read_location();
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
+
+  //call to command handler
+  //command - an array containing the command entered by the user
+  gyro_cmdHandler(command);
+
   while (1)
   {
-    /* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
   }
-  /* USER CODE END 3 */
+
 }
 
 /**
@@ -443,7 +489,7 @@ static void MEMS_Init(void)
 
   //LSM6DSL_G(&Gyro, LSM6DSL_2000dps);
   /* Configure the LSM6DSL gyroscope (ODR, scale and interrupt) */
-  LSM6DSL_GYRO_SetOutputDataRate(&Gyro, LSM6DSL_GY_ODR_26Hz); /* 26 Hz */
+  LSM6DSL_GYRO_SetOutputDataRate(&Gyro, 26); /* 26 Hz */
   LSM6DSL_GYRO_SetFullScale(&Gyro, 4);          /* [-4000mg; +4000mg] */
   LSM6DSL_GYRO_Set_INT1_DRDY(&Gyro, ENABLE);    /* Enable DRDY */
   LSM6DSL_GYRO_GetAxesRaw(&Gyro, &axes);        /* Clear DRDY */
